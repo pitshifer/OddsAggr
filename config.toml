@@ -1,0 +1,4 @@
+[jsonodds]
+api_key = ""
+url = "https://jsonodds.com/api/"
+odds_format = "decimal"
