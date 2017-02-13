@@ -1,53 +1,59 @@
 package jsonodds
 
 import (
-	"net/http"
-	"io/ioutil"
 	"encoding/json"
-	"github.com/pitshifer/oddsaggr/entity"
+	"github.com/pitshifer/OddsAggr/entity"
+	"io/ioutil"
 	"log"
+	"net/http"
 	"net/url"
 )
 
 type Config struct {
-	Key, Url, OddsFormat	string
+	Key, Url, OddsFormat string
 }
 
 type client struct {
-	apiKey 		string
-	url		string
-	oddsFormat	string
-	client 		http.Client
+	apiKey     string
+	url        string
+	oddsFormat string
+	client     http.Client
 }
 
 func New(cfg Config) *client {
-	if cfg.Key == "" && cfg.Url == "" {
+	if cfg.Key == "" || cfg.Url == "" {
 		log.Fatalln("Api-key and Url are required")
 	}
 	cli := client{
-		apiKey: 	cfg.Key,
-		url:		cfg.Url,
-		oddsFormat:	cfg.OddsFormat,
+		apiKey:     cfg.Key,
+		url:        cfg.Url,
+		oddsFormat: cfg.OddsFormat,
 	}
 
 	return &cli
 }
 
-func (cli client) GetSports() (entity.Sports, error) {
+func (cli client) GetSports() (*entity.Sports, error) {
 	var sports entity.Sports
-	var data map[int]string
+	var data map[int8]string
 
 	sportsByte, err := cli.request("sports", 0)
 	if err != nil {
-		return sports, err
+		return nil, err
 	}
 
 	if err := json.Unmarshal(sportsByte, &data); err != nil {
-		return sports, err
+		return nil, err
 	}
-	sports.SetData(data)
+	for i, n := range data {
+		sport := entity.Sport{
+			Id:	i,
+			Name:	n,
+		}
+		sports.Sports = append(sports.Sports, sport)
+	}
 
-	return sports, nil
+	return &sports, nil
 }
 
 func (cli client) GetOddTypes() (entity.OddTypes, error) {
@@ -69,7 +75,7 @@ func (cli client) GetOddTypes() (entity.OddTypes, error) {
 
 func (cli client) GetOddsBySport(sport string, source int) ([]entity.EventOdds, error) {
 	var eo []entity.EventOdds
-	eoByte, err := cli.request("odds/" + sport, 0)
+	eoByte, err := cli.request("odds/"+sport, 0)
 	if err != nil {
 		return eo, err
 	}
@@ -83,7 +89,7 @@ func (cli client) GetOddsBySport(sport string, source int) ([]entity.EventOdds, 
 func (cli client) request(path string, source int) ([]byte, error) {
 	client := &http.Client{}
 
-	url, err := url.Parse(cli.url + path);
+	url, err := url.Parse(cli.url + path)
 	if err != nil {
 		return nil, err
 	}
@@ -92,9 +98,9 @@ func (cli client) request(path string, source int) ([]byte, error) {
 	q.Set("oddsFormat", cli.oddsFormat)
 	url.RawQuery = q.Encode()
 	req := &http.Request{
-		Method:	"GET",
-		URL:	url,
-		Header:	http.Header{
+		Method: "GET",
+		URL:    url,
+		Header: http.Header{
 			"JsonOdds-API-Key": {cli.apiKey},
 		},
 	}
