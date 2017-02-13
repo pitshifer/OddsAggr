@@ -2,7 +2,7 @@ package jsonodds
 
 import (
 	"encoding/json"
-	"github.com/pitshifer/OddsAggr/entity"
+	"github.com/pitshifer/oddsaggr/entity"
 	"io/ioutil"
 	"log"
 	"net/http"

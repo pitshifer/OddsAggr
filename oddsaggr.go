@@ -4,8 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"github.com/BurntSushi/toml"
-	"github.com/pitshifer/OddsAggr/entity"
-	"github.com/pitshifer/OddsAggr/jsonodds"
+	"github.com/pitshifer/oddsaggr/entity"
+	"github.com/pitshifer/oddsaggr/jsonodds"
 	"log"
 	"net/http"
 )
