@@ -1,4 +1,4 @@
 [jsonodds]
-api_key = ""
+api_key = "5f0ceb75-edfe-11e6-a75b-0667553df103"
 url = "https://jsonodds.com/api/"
 odds_format = "decimal"

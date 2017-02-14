@@ -2,7 +2,7 @@ package jsonodds
 
 import (
 	"encoding/json"
-	"github.com/pitshifer/OddsAggr/entity"
+	"github.com/pitshifer/oddsaggr/entity"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -73,7 +73,7 @@ func (cli client) GetOddTypes() (*entity.OddTypes, error) {
 
 func (cli client) GetOddsBySport(sport string, source int) ([]entity.EventOdds, error) {
 	var eo []entity.EventOdds
-	eoByte, err := cli.request("odds/"+sport, 0)
+	eoByte, err := cli.request("odds/" + sport, source)
 	if err != nil {
 		return eo, err
 	}

@@ -4,15 +4,15 @@ import (
 	"flag"
 	"fmt"
 	"github.com/BurntSushi/toml"
-	"github.com/pitshifer/OddsAggr/entity"
-	"github.com/pitshifer/OddsAggr/jsonodds"
+	"github.com/pitshifer/oddsaggr/entity"
+	"github.com/pitshifer/oddsaggr/jsonodds"
 	"log"
 	"net/http"
 )
 
 var client interface {
 	GetSports() (*entity.Sports, error)
-	GetOddTypes() (*entity.OddTypes, error)
+	GetOddTypes() (entity.OddTypes, error)
 	GetOddsBySport(sport string, source int) ([]entity.EventOdds, error)
 }
 
@@ -54,7 +54,6 @@ func main() {
 	})
 
 	http.HandleFunc("/sports/", showSports)
-	http.HandleFunc("/oddtypes/", showOddTypes)
 	http.HandleFunc("/events/soccer", showEvents)
 
 	log.Println("Server started on port: " + port)
@@ -69,16 +68,6 @@ func showSports(resp http.ResponseWriter, req *http.Request) {
 	}
 
 	fmt.Fprintf(resp, "%s", sports)
-}
-
-func showOddTypes(resp http.ResponseWriter, req *http.Request) {
-	ot, err := client.GetOddTypes()
-	if err != nil {
-		fmt.Fprintln(resp, err)
-		return
-	}
-
-	fmt.Fprintf(resp, "%s", *ot)
 }
 
 func showEvents(resp http.ResponseWriter, req *http.Request) {
