@@ -12,7 +12,7 @@ import (
 
 var client interface {
 	GetSports() (*entity.Sports, error)
-	GetOddTypes() (entity.OddTypes, error)
+	GetOddTypes() (*entity.OddTypes, error)
 	GetOddsBySport(sport string, source int) ([]entity.EventOdds, error)
 }
 
@@ -78,7 +78,7 @@ func showOddTypes(resp http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	fmt.Fprintf(resp, "%s", ot)
+	fmt.Fprintf(resp, "%s", *ot)
 }
 
 func showEvents(resp http.ResponseWriter, req *http.Request) {

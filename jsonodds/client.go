@@ -56,21 +56,19 @@ func (cli client) GetSports() (*entity.Sports, error) {
 	return &sports, nil
 }
 
-func (cli client) GetOddTypes() (entity.OddTypes, error) {
+func (cli client) GetOddTypes() (*entity.OddTypes, error) {
 	var ot entity.OddTypes
-	var data []string
 
 	otByte, err := cli.request("oddtype", 0)
 	if err != nil {
-		return ot, err
+		return nil, err
 	}
 
-	if err := json.Unmarshal(otByte, &data); err != nil {
-		return ot, err
+	if err := json.Unmarshal(otByte, &ot); err != nil {
+		return nil, err
 	}
-	ot.SetData(data)
 
-	return ot, nil
+	return &ot, nil
 }
 
 func (cli client) GetOddsBySport(sport string, source int) ([]entity.EventOdds, error) {

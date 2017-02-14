@@ -16,10 +16,7 @@ type Sports struct {
 	Sports	[]Sport
 }
 
-type OddTypes struct {
-	Stringer
-	data []string
-}
+type OddTypes []string
 
 type Event struct {
 	Stringer
@@ -64,15 +61,11 @@ func (s Sports) String() string {
 }
 
 func (ot OddTypes) String() string {
-	b, err := json.Marshal(ot.data)
+	b, err := json.Marshal(ot)
 	if err != nil {
 		return err.Error()
 	}
 	return string(b)
-}
-
-func (ot *OddTypes) SetData(data []string) {
-	ot.data = data
 }
 
 func (eo Event) String() {
