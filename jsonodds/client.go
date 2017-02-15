@@ -71,6 +71,20 @@ func (cli client) GetOddTypes() (*entity.OddTypes, error) {
 	return &ot, nil
 }
 
+func (cli client) GetFinalType() (*[]string, error)  {
+	var ft []string
+
+	ftB, err := cli.request("finaltype", map[string]string{})
+	if err != nil {
+		return nil, err
+	}
+	if err := json.Unmarshal(ftB, &ft); err != nil {
+		return nil, err
+	}
+
+	return &ft, nil;
+}
+
 func (cli client) GetOddsBySport(sport, source string) (*[]entity.EventOdds, error) {
 	var eo []entity.EventOdds
 
