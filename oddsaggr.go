@@ -13,6 +13,7 @@ import (
 var client interface {
 	GetSports() (*entity.Sports, error)
 	GetOddTypes() (*entity.OddTypes, error)
+	GetFinalType() (*[]string, error)
 	GetOddsBySport(sport, source string) (*[]entity.EventOdds, error)
 	GetOdds(sport, oddType, source string) (*[]entity.EventOdds, error)
 }
