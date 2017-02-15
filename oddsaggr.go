@@ -8,12 +8,14 @@ import (
 	"github.com/pitshifer/oddsaggr/jsonodds"
 	"log"
 	"net/http"
+	"os"
+	"github.com/kr/pretty"
 )
 
 var client interface {
 	GetSports() (*entity.Sports, error)
 	GetOddTypes() (*entity.OddTypes, error)
-	GetOddsBySport(sport string, source int) ([]entity.EventOdds, error)
+	GetOddsBySport(sport, source string) (*[]entity.EventOdds, error)
 }
 
 type Config struct {
@@ -23,7 +25,7 @@ type Config struct {
 type JOConfig struct {
 	Key        string `toml:"api_key"`
 	Url        string `toml:"url"`
-	OddsFormat string `toml:"odds_format"`
+	OddFormat  string `toml:"odd_format"`
 }
 
 const (
@@ -46,8 +48,15 @@ func main() {
 	client = jsonodds.New(jsonodds.Config{
 		Url:        config.Jsonodds.Url,
 		Key:        config.Jsonodds.Key,
-		OddsFormat: config.Jsonodds.OddsFormat,
+		OddFormat:  config.Jsonodds.OddFormat,
 	})
+
+	if result, err := client.GetOddsBySport("khl", "0"); err == nil{
+		pretty.Println(result)
+	} else {
+		log.Fatal(err)
+	}
+	os.Exit(0)
 
 	http.HandleFunc("/", func(resp http.ResponseWriter, req *http.Request) {
 		fmt.Fprintln(resp, "OddsAggregator")
@@ -71,6 +80,6 @@ func showSports(resp http.ResponseWriter, req *http.Request) {
 }
 
 func showEvents(resp http.ResponseWriter, req *http.Request) {
-	client.GetOddsBySport("soccer", 0)
+	client.GetOddsBySport("soccer", "0")
 
 }

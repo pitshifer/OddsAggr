@@ -10,13 +10,13 @@ import (
 )
 
 type Config struct {
-	Key, Url, OddsFormat string
+	Key, Url, OddFormat string
 }
 
 type client struct {
 	apiKey     string
 	url        string
-	oddsFormat string
+	oddFormat  string
 	client     http.Client
 }
 
@@ -27,7 +27,7 @@ func New(cfg Config) *client {
 	cli := client{
 		apiKey:     cfg.Key,
 		url:        cfg.Url,
-		oddsFormat: cfg.OddsFormat,
+		oddFormat: cfg.OddFormat,
 	}
 
 	return &cli
@@ -37,7 +37,7 @@ func (cli client) GetSports() (*entity.Sports, error) {
 	var sports entity.Sports
 	var data map[int8]string
 
-	sportsByte, err := cli.request("sports", 0)
+	sportsByte, err := cli.request("sports", "0")
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ func (cli client) GetSports() (*entity.Sports, error) {
 func (cli client) GetOddTypes() (*entity.OddTypes, error) {
 	var ot entity.OddTypes
 
-	otByte, err := cli.request("oddtype", 0)
+	otByte, err := cli.request("oddtype", "0")
 	if err != nil {
 		return nil, err
 	}
@@ -71,33 +71,34 @@ func (cli client) GetOddTypes() (*entity.OddTypes, error) {
 	return &ot, nil
 }
 
-func (cli client) GetOddsBySport(sport string, source int) ([]entity.EventOdds, error) {
+func (cli client) GetOddsBySport(sport, source string) (*[]entity.EventOdds, error) {
 	var eo []entity.EventOdds
+
 	eoByte, err := cli.request("odds/" + sport, source)
-	if err != nil {
-		return eo, err
-	}
-	if err := json.Unmarshal(eoByte, &eo); err != nil {
-		return eo, err
-	}
-
-	return eo, nil
-}
-
-func (cli client) request(path string, source int) ([]byte, error) {
-	client := &http.Client{}
-
-	url, err := url.Parse(cli.url + path)
 	if err != nil {
 		return nil, err
 	}
-	q := url.Query()
-	q.Set("source", string(source))
-	q.Set("oddsFormat", cli.oddsFormat)
-	url.RawQuery = q.Encode()
+	if err := json.Unmarshal(eoByte, &eo); err != nil {
+		return nil, err
+	}
+
+	return &eo, nil
+}
+
+func (cli client) request(path, source string) ([]byte, error) {
+	client := &http.Client{}
+
+	u, err := url.Parse(cli.url + path)
+	if err != nil {
+		return nil, err
+	}
+	q := u.Query()
+	q.Set("source", source)
+	q.Set("oddFormat", cli.oddFormat)
+	u.RawQuery = q.Encode()
 	req := &http.Request{
 		Method: "GET",
-		URL:    url,
+		URL:    u,
 		Header: http.Header{
 			"JsonOdds-API-Key": {cli.apiKey},
 		},
