@@ -37,7 +37,7 @@ func (cli client) GetSports() (*entity.Sports, error) {
 	var sports entity.Sports
 	var data map[int8]string
 
-	sportsByte, err := cli.request("sports", "0")
+	sportsByte, err := cli.request("sports", map[string]string{})
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ func (cli client) GetSports() (*entity.Sports, error) {
 func (cli client) GetOddTypes() (*entity.OddTypes, error) {
 	var ot entity.OddTypes
 
-	otByte, err := cli.request("oddtype", "0")
+	otByte, err := cli.request("oddtype", map[string]string{})
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +74,7 @@ func (cli client) GetOddTypes() (*entity.OddTypes, error) {
 func (cli client) GetOddsBySport(sport, source string) (*[]entity.EventOdds, error) {
 	var eo []entity.EventOdds
 
-	eoByte, err := cli.request("odds/" + sport, source)
+	eoByte, err := cli.request("odds/" + sport, map[string]string{"source": source})
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +85,21 @@ func (cli client) GetOddsBySport(sport, source string) (*[]entity.EventOdds, err
 	return &eo, nil
 }
 
-func (cli client) request(path, source string) ([]byte, error) {
+func (cli client) GetOdds(sport, oddType, source string) (*[]entity.EventOdds, error) {
+	var eo []entity.EventOdds
+
+	eoByte, err := cli.request("odds", map[string]string{"source": source, "oddType": oddType})
+	if err != nil {
+		return nil, err
+	}
+	if err := json.Unmarshal(eoByte, &eo); err != nil {
+		return nil, err
+	}
+
+	return &eo, nil
+}
+
+func (cli client) request(path string, params map[string]string) ([]byte, error) {
 	client := &http.Client{}
 
 	u, err := url.Parse(cli.url + path)
@@ -93,7 +107,9 @@ func (cli client) request(path, source string) ([]byte, error) {
 		return nil, err
 	}
 	q := u.Query()
-	q.Set("source", source)
+	for p, n := range params {
+		q.Set(p, n)
+	}
 	q.Set("oddFormat", cli.oddFormat)
 	u.RawQuery = q.Encode()
 	req := &http.Request{
