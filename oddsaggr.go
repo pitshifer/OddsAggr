@@ -12,7 +12,7 @@ import (
 
 var client interface {
 	GetSports() (*entity.Sports, error)
-	GetOddTypes() (entity.OddTypes, error)
+	GetOddTypes() (*entity.OddTypes, error)
 	GetOddsBySport(sport string, source int) ([]entity.EventOdds, error)
 }
 
