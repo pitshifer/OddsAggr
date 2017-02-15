@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"time"
 )
 
 type Config struct {
@@ -99,7 +100,7 @@ func (cli client) GetOddsBySport(sport, source string) (*[]entity.EventOdds, err
 	return &eo, nil
 }
 
-func (cli client) GetOdds(sport, oddType, source string) (*[]entity.EventOdds, error) {
+func (cli client) GetOdds(oddType, source string) (*[]entity.EventOdds, error) {
 	var eo []entity.EventOdds
 
 	eoByte, err := cli.request("odds", map[string]string{"source": source, "oddType": oddType})
@@ -126,6 +127,8 @@ func (cli client) request(path string, params map[string]string) ([]byte, error)
 	}
 	q.Set("oddFormat", cli.oddFormat)
 	u.RawQuery = q.Encode()
+	log.Println(u.String())
+	time.Sleep(3 * time.Second)
 	req := &http.Request{
 		Method: "GET",
 		URL:    u,

@@ -15,7 +15,7 @@ var client interface {
 	GetOddTypes() (*entity.OddTypes, error)
 	GetFinalType() (*[]string, error)
 	GetOddsBySport(sport, source string) (*[]entity.EventOdds, error)
-	GetOdds(sport, oddType, source string) (*[]entity.EventOdds, error)
+	GetOdds(oddType, source string) (*[]entity.EventOdds, error)
 }
 
 type Config struct {
