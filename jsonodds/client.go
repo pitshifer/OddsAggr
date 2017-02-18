@@ -4,10 +4,9 @@ import (
 	"encoding/json"
 	"github.com/pitshifer/oddsaggr/entity"
 	"io/ioutil"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 	"net/url"
-	"time"
 )
 
 type Config struct {
@@ -30,6 +29,7 @@ func New(cfg Config) *client {
 		url:        cfg.Url,
 		oddFormat: cfg.OddFormat,
 	}
+	log.Debug("Created client config")
 
 	return &cli
 }
@@ -127,8 +127,6 @@ func (cli client) request(path string, params map[string]string) ([]byte, error)
 	}
 	q.Set("oddFormat", cli.oddFormat)
 	u.RawQuery = q.Encode()
-	log.Println(u.String())
-	time.Sleep(3 * time.Second)
 	req := &http.Request{
 		Method: "GET",
 		URL:    u,
@@ -136,12 +134,18 @@ func (cli client) request(path string, params map[string]string) ([]byte, error)
 			"JsonOdds-API-Key": {cli.apiKey},
 		},
 	}
+	log.WithFields(log.Fields{
+		"url": u.String(),
+	}).Info("Do request")
 
 	resp, err := client.Do(req)
 	defer resp.Body.Close()
 	if err != nil {
 		return nil, err
 	}
+	log.WithFields(log.Fields{
+		"statusCode": resp.StatusCode,
+	}).Info("Response")
 
 	b, err := ioutil.ReadAll(resp.Body)
 

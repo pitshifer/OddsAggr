@@ -6,7 +6,7 @@ import (
 	"github.com/BurntSushi/toml"
 	"github.com/pitshifer/oddsaggr/entity"
 	"github.com/pitshifer/oddsaggr/jsonodds"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 )
 
@@ -18,14 +18,17 @@ var client interface {
 	GetOdds(oddType, source string) (*[]entity.EventOdds, error)
 }
 
+var config Config
+
 type Config struct {
-	Jsonodds JOConfig
+	Environment	string		`toml:"environment"`
+	Jsonodds 	JOConfig
 }
 
 type JOConfig struct {
-	Key        string `toml:"api_key"`
-	Url        string `toml:"url"`
-	OddFormat  string `toml:"odd_format"`
+	Key        	string	 	`toml:"api_key"`
+	Url        	string 		`toml:"url"`
+	OddFormat  	string 		`toml:"odd_format"`
 }
 
 const (
@@ -36,7 +39,6 @@ const (
 func main() {
 	var port string
 	var configFile string
-	var config Config
 
 	flag.StringVar(&port, "-p", DEFAULT_PORT, "port")
 	flag.StringVar(&configFile, "-c", DEFAULT_CONFIG_FILE, "config file")
@@ -45,6 +47,9 @@ func main() {
 	if _, err := toml.DecodeFile(configFile, &config); err != nil {
 		log.Fatalln(err)
 	}
+
+	loggerInit()
+
 	client = jsonodds.New(jsonodds.Config{
 		Url:        config.Jsonodds.Url,
 		Key:        config.Jsonodds.Key,
@@ -57,7 +62,7 @@ func main() {
 
 	http.HandleFunc("/sports/", showSports)
 
-	log.Println("Server started on port: " + port)
+	log.Info("Server started on port: " + port)
 	log.Fatal(http.ListenAndServe("localhost:"+port, nil))
 }
 
