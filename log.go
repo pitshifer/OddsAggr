@@ -5,9 +5,9 @@ import (
 	"os"
 )
 
-func loggerInit() {
+func loggerInit(cfg Config) {
 	log.SetOutput(os.Stdout)
-	if config.Environment == "dev" {
+	if cfg.Environment == "dev" {
 		log.SetFormatter(&log.TextFormatter{})
 		log.SetLevel(log.DebugLevel)
 	} else {

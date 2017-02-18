@@ -48,7 +48,7 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	loggerInit()
+	loggerInit(config)
 
 	client = jsonodds.New(jsonodds.Config{
 		Url:        config.Jsonodds.Url,
