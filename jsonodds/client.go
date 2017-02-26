@@ -7,6 +7,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"net/http"
 	"net/url"
+	"fmt"
 )
 
 type Config struct {
@@ -32,6 +33,25 @@ func New(cfg Config) *client {
 	log.Debug("Created client config")
 
 	return &cli
+}
+
+func (cli client) GetSources() (*[]entity.Source, error) {
+	var sources []entity.Source
+	var data map[string]int8
+
+	sourcesByte, err := cli.request("sources", map[string]string{})
+	if err != nil {
+		return nil, err
+	}
+	if err = json.Unmarshal(sourcesByte, &data); err != nil {
+		return nil, err
+	}
+
+	for name, id := range data {
+		sources = append(sources, entity.Source{Id: id, Name: name})
+	}
+
+	return &sources, nil
 }
 
 func (cli client) GetSports() (*entity.Sports, error) {
@@ -142,6 +162,9 @@ func (cli client) request(path string, params map[string]string) ([]byte, error)
 	defer resp.Body.Close()
 	if err != nil {
 		return nil, err
+	}
+	if resp.StatusCode != 200 {
+		return nil, fmt.Errorf("Failed request: status - %v: ", resp.Status)
 	}
 	log.WithFields(log.Fields{
 		"statusCode": resp.StatusCode,

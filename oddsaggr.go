@@ -12,6 +12,7 @@ import (
 )
 
 var client interface {
+	GetSources() (*[]entity.Source, error)
 	GetSports() (*entity.Sports, error)
 	GetOddTypes() (*entity.OddTypes, error)
 	GetFinalType() (*[]string, error)

@@ -6,6 +6,11 @@ type Stringer interface {
 	String() string
 }
 
+type Source struct {
+	Id	int8
+	Name	string
+}
+
 type Sport struct {
 	Id	int8
 	Name	string
